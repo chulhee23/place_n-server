@@ -3,14 +3,16 @@ require 'rails_helper'
 
 RSpec.describe 'Comments API' do
   # Initialize the test data
+  let(:user) { create(:user) }
   let!(:post) { create(:post) }
   let!(:comments) { create_list(:comment, 20, post_id: post.id) }
   let(:post_id) { post.id }
   let(:id) { comments.first.id }
+  let(:headers) { valid_headers }
 
   # Test suite for GET /posts/:post_id/comments
   describe 'GET /posts/:post_id/comments' do
-    before { get "/posts/#{post_id}/comments" }
+    before { get "/posts/#{post_id}/comments", headers: headers }
 
     context 'when post exists' do
       it 'returns status code 200' do
@@ -37,7 +39,7 @@ RSpec.describe 'Comments API' do
 
   # Test suite for GET /posts/:post_id/comments/:id
   describe 'GET /posts/:post_id/comments/:id' do
-    before { get "/posts/#{post_id}/comments/#{id}" }
+    before { get "/posts/#{post_id}/comments/#{id}", headers: headers }
 
     context 'when todo comment exists' do
       it 'returns status code 200' do
@@ -64,6 +66,7 @@ RSpec.describe 'Comments API' do
 
   # Test suite for PUT /posts/:post_id/comments
   describe 'POST /posts/:post_id/comments' do
+    
     let(:valid_attributes) { { content: 'Visit Narnia' } }
     context 'when request attributes are valid' do
       
@@ -89,9 +92,9 @@ RSpec.describe 'Comments API' do
 
   # Test suite for PUT /posts/:post_id/comments/:id
   describe 'PUT /posts/:post_id/comments/:id' do
-    let(:valid_attributes) { { content: 'Mozart' } }
+    let(:valid_attributes) { { content: 'Mozart' }.to_json }
 
-    before { put "/posts/#{post_id}/comments/#{id}", params: valid_attributes }
+    before { put "/posts/#{post_id}/comments/#{id}", params: valid_attributes, headers: headers }
 
     context 'when comment exists' do
       it 'returns status code 204' do
@@ -119,7 +122,7 @@ RSpec.describe 'Comments API' do
 
   # Test suite for DELETE /posts/:id
   describe 'DELETE /posts/:id' do
-    before { delete "/posts/#{post_id}/comments/#{id}" }
+    before { delete "/posts/#{post_id}/comments/#{id}", headers: headers }
 
     it 'returns status code 204' do
       expect(response).to have_http_status(204)

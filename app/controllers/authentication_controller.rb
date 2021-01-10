@@ -1,4 +1,6 @@
 class AuthenticationController < ApplicationController
+  skip_before_action :authorize_request, only: :authenticate
+  
   # The authentication controller should expose an /auth/login endpoint that accepts user credentials and returns a JSON response with the result.
   # return auth token once user is authenticated
   def authenticate

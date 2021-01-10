@@ -2,13 +2,15 @@ require 'rails_helper'
 
 RSpec.describe 'Posts API', type: :request do
   # initialize test data
+  let(:user) { create(:user) }
   let!(:posts) { create_list(:post, 10) }
   let(:post_id) { posts.first.id }
+  let(:headers) { valid_headers }
 
   # Test suite for GET /posts
   describe 'GET /posts' do
     # make HTTP get request before each example
-    before { get '/posts' }
+    before { get '/posts', params: {}, headers: headers }
 
     it 'returns posts' do
       # Note `json` is a custom helper to parse JSON responses
@@ -23,7 +25,7 @@ RSpec.describe 'Posts API', type: :request do
 
   # Test suite for GET /posts/:id
   describe 'GET /posts/:id' do
-    before { get "/posts/#{post_id}" }
+    before { get "/posts/#{post_id}", headers: headers }
 
     context 'when the record exists' do
       it 'returns the todo' do
@@ -52,10 +54,10 @@ RSpec.describe 'Posts API', type: :request do
   # Test suite for POST /posts
   describe 'POST /posts' do
     # valid payload
-    let(:valid_attributes) { { content: 'Learn Elm' } }
+    let(:valid_attributes) { { content: 'Learn Elm' }.to_json }
 
     context 'when the request is valid' do
-      before { post '/posts', params: valid_attributes }
+      before { post '/posts', params: valid_attributes, headers: headers }
 
       it 'creates a post' do
         expect(json['content']).to eq('Learn Elm')
@@ -67,7 +69,7 @@ RSpec.describe 'Posts API', type: :request do
     end
 
     context 'when the request is invalid' do
-      before { post '/posts', params: { title: 'Foobar' } }
+      before { post '/posts', params: { title: 'Foobar' }.to_json, headers: headers }
 
       it 'returns status code 422' do
         expect(response).to have_http_status(422)
@@ -82,10 +84,10 @@ RSpec.describe 'Posts API', type: :request do
 
   # Test suite for PUT /posts/:id
   describe 'PUT /posts/:id' do
-    let(:valid_attributes) { { content: 'Shopping' } }
+    let(:valid_attributes) { { content: 'Shopping' }.to_json }
 
     context 'when the record exists' do
-      before { put "/posts/#{post_id}", params: valid_attributes }
+      before { put "/posts/#{post_id}", params: valid_attributes, headers: headers }
 
       it 'updates the record' do
         expect(response.body).to be_empty
@@ -99,7 +101,7 @@ RSpec.describe 'Posts API', type: :request do
 
   # Test suite for DELETE /posts/:id
   describe 'DELETE /posts/:id' do
-    before { delete "/posts/#{post_id}" }
+    before { delete "/posts/#{post_id}", headers: headers }
 
     it 'returns status code 204' do
       expect(response).to have_http_status(204)
