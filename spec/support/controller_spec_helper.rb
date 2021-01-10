@@ -1,3 +1,4 @@
+# have additional test helpers to generate headers
 module ControllerSpecHelper
   # generate tokens from user id
   def token_generator(user_id)
